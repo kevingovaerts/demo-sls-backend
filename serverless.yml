@@ -1,0 +1,74 @@
+service: sls-todo-demo
+
+package:
+  individually: true
+
+plugins:
+  - serverless-bundle
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: eu-west-1
+
+functions:
+  get-todos:
+    role: lambdaDynamoRole
+    environment:
+      TableName: ${self:service}-${opt:stage, self:provider.stage}-database
+    handler: get-todos.handler
+    events:
+      - http:
+          path: todo
+          method: get
+          cors: true
+          authorizer: aws_iam
+  put-todo:
+    role: lambdaDynamoRole
+    environment:
+      TableName: ${self:service}-${opt:stage, self:provider.stage}-database
+    handler: put-todo.handler
+    events:
+      - http:
+          path: todo
+          method: put
+          cors: true
+          authorizer: aws_iam
+  post-todo:
+    role: lambdaDynamoRole
+    environment:
+      TableName: ${self:service}-${opt:stage, self:provider.stage}-database
+    handler: post-todo.handler
+    events:
+      - http:
+          path: todo
+          method: post
+          cors: true
+          authorizer: aws_iam
+  delete-todo:
+    role: lambdaDynamoRole
+    environment:
+      TableName: ${self:service}-${opt:stage, self:provider.stage}-database
+    handler: delete-todo.handler
+    events:
+      - http:
+          path: todo
+          method: delete
+          cors: true
+          authorizer: aws_iam
+# Create our resources with separate CloudFormation templates
+resources:
+  # API Gateway Errors
+  - ${file(resources/api-gateway-errors.yml)}
+  # DynamoDB
+  - ${file(resources/dynamodb-tables.yml)}
+  # Cognito
+  - ${file(resources/cognito-user-pool.yml)}
+  # Cognito
+  - ${file(resources/lambda-iam-roles.yml)}

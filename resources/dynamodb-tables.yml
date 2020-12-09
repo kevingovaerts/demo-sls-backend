@@ -1,0 +1,12 @@
+Resources:
+  demoTodoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${self:service}-${opt:stage, self:provider.stage}-database
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
